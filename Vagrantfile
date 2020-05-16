@@ -53,11 +53,9 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provision "shell", inline:$script
     subconfig.vm.provider "virtualbox" do |v|
        v.memory = 4096
-       v.cpus = 2   
+       v.cpus = 2
+    end      
   end
-    
-  end
-
   config.vm.define "node1" do |subconfig|
     subconfig.vm.box = "centos/7"
     subconfig.vm.network "public_network", ip: "192.168.1.92", bridge: "en0: Wi-Fi (Wireless)"
@@ -65,9 +63,9 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provision "shell", inline:$script
     subconfig.vm.provider "virtualbox" do |v|
        v.memory = 4096
-       v.cpus = 2 
+       v.cpus = 2
+    end    
   end
-
   config.vm.define "node2" do |subconfig|
     subconfig.vm.box = "centos/7"
     subconfig.vm.network "public_network", ip: "192.168.1.93", bridge: "en0: Wi-Fi (Wireless)"
@@ -76,5 +74,6 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provider "virtualbox" do |v|
        v.memory = 4096
        v.cpus = 2 
+    end   
   end  
-end
+end  
