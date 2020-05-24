@@ -1,0 +1,36 @@
+$script = <<-SCRIPT
+yum install epel-release -y 
+yum update -y
+yum install  -y net-tools wget 
+yum install -y yum-utils device-mapper-persistent-data lvm2
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum install -y  docker-ce docker-ce-cli containerd.io
+systemctl start docker
+systemctl enable docker
+cp /home/vagrant/daemon.json /etc/docker/daemon.json
+systemctl daemon-reload
+systemctl restart docker
+cd /home/vagrant
+wget  https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-server-v3.11.0-0cbc58b-linux-64bit.tar.gz
+tar -xvf /home/vagrant/openshift-origin-server-v3.11.0-0cbc58b-linux-64bit.tar.gz
+export PATH=$PATH:/home/vagrant/openshift-origin-server-v3.11.0-0cbc58b-linux-64bit
+/home/vagrant/openshift-origin-server-v3.11.0-0cbc58b-linux-64bit/oc cluster up 
+SCRIPT
+
+Vagrant.configure("2") do |config|  
+  config.vm.define "okd" do |subconfig|
+    subconfig.vm.box = "centos/7"
+    subconfig.vm.network "forwarded_port", guest: 80, host: 8080, protocol: "tcp"
+    auto_correct = true
+    subconfig.vm.network "forwarded_port", guest: 8443, host: 8443, host_ip: "127.0.0.1"
+    auto_correct = true
+    subconfig.vm.hostname = 'okd.local'
+    subconfig.vm.provision "file", source: "./daemon.json", destination: "/home/vagrant/daemon.json"
+    subconfig.vm.provision "shell", inline:$script
+    subconfig.disksize.size = '50GB'
+    subconfig.vm.provider "virtualbox" do |v|
+       v.memory = 4096
+       v.cpus = 2
+    end      
+  end
+end
